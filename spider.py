@@ -11,12 +11,14 @@ import random
 from lxml import etree
 import pandas as pd
 
+
 class FIFA21:
 
     def __init__(self):
 
         self.headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko"}
-        self.baseURL = 'https://sofifa.com/players?type=all&lg%5B%5D=13&lg%5B%5D=16&lg%5B%5D=19&lg%5B%5D=31&lg%5B%5D=53'
+        self.baseURL = 'https://sofifa.com/players?type=all&lg%5B%5D=13&lg%5B%5D=16&lg%5B%5D=19&lg%5B%5D=31&lg%5B%5D=53'  # 五大联赛球员
+        # self.baseURL = 'https://sofifa.com/'  # 所有球员数据
         self.path = 'data.csv'
         self.row_num = 0
         self.title = ['player_name', 'basic_info', 'Overall_rating', 'Potential', 'Value', 'Wage',
@@ -54,7 +56,7 @@ class FIFA21:
 
         result = []
         for link in player_links:
-            result.append(self.baseURL[:-77] + link)
+            result.append(self.baseURL[:-77] + link)  # 如果是所有球员，就是-1；五大联赛就是-77
 
         return result
         # return [self.baseURL[:-1]+link for link in player_links]
@@ -65,12 +67,12 @@ class FIFA21:
         html = etree.HTML(content)
         new_page = html.xpath("//div[@class='pagination']/a/@href")
         if url == self.baseURL:
-            return self.baseURL[:-77] + new_page[0]
+            return self.baseURL[:-77] + new_page[0]  # 如果是所有球员，就是-1；五大联赛就是-77
         else:
             if len(new_page) == 1:
                 return 'stop'
             else:
-                return self.baseURL[:-77] + new_page[1]
+                return self.baseURL[:-77] + new_page[1]  # 如果是所有球员，就是-1；五大联赛就是-77
 
     def Get_player_small_field(self, html):
 
@@ -134,7 +136,7 @@ class FIFA21:
         # // *[ @ id = "body"] / div[3] / div / div[2] / div[9] / div / ul / li[1] / span[1]
         #  上面这一行， 在F12里面“复制XPath”就行了
         keys = html.xpath("//div[3]/div[@class='grid']/div[@class='col col-12']"
-                          "/div[@class='block-quarter']/div[@class='card']/ul[@class='pl']/li/span[@role='tooltip']/text()")
+                          "/div[@class='block-quarter']/div[@class='card']/ul[@class='pl']/li/span[@role='tooltip']/text()")  # 为了防止能力值旁边有+-数值，span不能[2]，需要用@role制定字段
 
         if (len(keys) == 0):
             keys = html.xpath("//div[2]/div[@class='grid']/div[@class='col col-12']"
