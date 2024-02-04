@@ -4,13 +4,13 @@
 import gevent
 from gevent import monkey
 
-monkey.patch_all()
+# monkey.patch_all()
 import time
 import requests
 import random
 from lxml import etree
 import pandas as pd
-
+from bs4 import BeautifulSoup
 
 class FIFA21:
 
@@ -44,12 +44,16 @@ class FIFA21:
 
     def loadPage(self, url):
         time.sleep(random.random())
-        return requests.get(url, headers=self.headers).content
+        return requests.get(url, headers=self.headers)
 
     def get_player_links(self, url):
-        # print(self.baseURL[:-1])  # debug
+        print(self.baseURL[:-1])  # debug
         content = self.loadPage(url)
-        html = etree.HTML(content)
+        content = BeautifulSoup(content.text, 'html.parser')
+        part_player_urls=content.findAll('tr')
+        for player_url in part_player_urls:
+
+        html = etree.HTML(bytes(bytearray(content.text, encoding='utf-8')))
         player_links = html.xpath(
             "//div[@class='card']/table[@class='table table-hover persist-area']/tbody[@class='list']"
             "/tr/td[@class='col-name']/a[@role='tooltip']/@href")
@@ -148,8 +152,8 @@ class FIFA21:
             values = html.xpath("//div[2]/div[@class='grid']/div[@class='col col-12']"
                                 "/div[@class='block-quarter']/div[@class='card']/ul[@class='pl']/li/span[1]/text()")
 
-        # print(keys)  # debug
-        # print(values)  # debug
+        print(keys)  # debug
+        print(values)  # debug
 
         values = values[:len(keys)]
         values = dict(zip(keys, values))
@@ -184,7 +188,7 @@ class FIFA21:
 
             print(current_url)  # 首页，只有offset的区别
             player_links = self.get_player_links(current_url)  # 首页上所有球员的具体url，进入详情页
-            print(player_links)  # debug
+            # print(player_links)  # debug
 
             jobs = []
             for link in player_links:
